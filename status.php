@@ -1,6 +1,6 @@
 <?php
 
-#This project was developed by @masoudiofficial, all the code in this file is the result of his ideas and creativity.
+#This project was developed by @masoudiofficial, and all the code in the status.php file is the result of his ideas and creativity.
 
 include_once './config.php';
 
@@ -46,52 +46,62 @@ function xpersiandatetime() {
     return $results;
 }
 
-if (isset($_POST['xreceivechats']) && !empty($_POST['xreceivechats']) && preg_match('/^[a-z]+$/', $_POST['xreceivechats']) && $_POST['xreceivechats'] === 'xtrue') {
+if (isset($_POST["xreceivechats"]) && !empty($_POST["xreceivechats"]) && preg_match("/^[a-z]+$/", $_POST["xreceivechats"]) && $_POST["xreceivechats"] === "xtrue" && empty($_FILES)) {
     if (strtolower($_SERVER['HTTP_HOST']) === 'localhost' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (preg_match('/^[a-z0-9]+$/', $_POST['xreceiverchat']) && mb_strlen($_POST['xreceiverchat'], 'UTF-8') <= 32) {
+        if (isset($_POST["xreceiverchat"]) && !empty($_POST["xreceiverchat"]) && preg_match("/^[a-z0-9]+$/", $_POST["xreceiverchat"]) && strlen($_POST["xreceiverchat"]) <= 32) {
 
-            $xpersiandatetime = xpersiandatetime();
+            try {
 
-            $xupdate = $xconnection->prepare("UPDATE userstable SET chatsstatus=CONCAT(?, chatsstatus) WHERE username=?");
-            $xupdate->execute([substr(str_shuffle('kF4dXHVenfSaq5KAyZcuBmUY1PT78pGtLl0sirhCJEMNjwQWDx9zOIR2o3bv6g'), 0, 19) . '>' . $xpersiandatetime['datetime1'] . ',', $_POST['xreceiverchat']]);
+                $xpersiandatetime = xpersiandatetime();
 
-            $xselect = $xconnection->prepare("SELECT chats, chatsstatus FROM userstable WHERE username=?");
-            $xselect->execute([$_POST['xreceiverchat']]);
-            $xselect = $xselect->fetch(PDO::FETCH_ASSOC);
+                $xupdate1 = $xconnection->prepare("UPDATE userstable SET chatsstatus=CONCAT(?, chatsstatus) WHERE username=?");
+                $xupdate1->execute([substr(str_shuffle('kF4dXHVenfSaq5KAyZcuBmUY1PT78pGtLl0sirhCJEMNjwQWDx9zOIR2o3bv6g'), 0, 19) . '>' . $xpersiandatetime['datetime1'] . ',', $_POST['xreceiverchat']]);
 
-            $xchatsstatus = $xselect['chatsstatus'];
-            $xchats = $xselect['chats'];
+                $xselect1 = $xconnection->prepare("SELECT chats, chatsstatus FROM userstable WHERE username=?");
+                $xselect1->execute([$_POST['xreceiverchat']]);
+                $xselect1_r = $xselect1->fetch(PDO::FETCH_ASSOC);
 
-            if ($xchats !== '') {
-                $xtotal = 0;
-                if ($xchatsstatus !== '' && strpos($xchatsstatus, $xpersiandatetime['datetime3']) !== false) {
-                    $xfiltered = [];
-                    $xfiltered2 = [];
-                    $xfiltered3 = '';
-                    $xarray = explode(',', substr($xchatsstatus, 0, -1));
-                    foreach ($xarray as $xnum) {
-                        $xnum2 = explode('>', $xnum)[1];
-                        if ($xnum2 >= $xpersiandatetime['datetime2']) {
-                            $xfiltered2[] = $xnum;
-                        } else if ($xnum2 < $xpersiandatetime['datetime2'] && $xnum2 > $xpersiandatetime['datetime3']) {
-                            $xfiltered2[] = $xnum;
-                            $xfiltered[] = $xnum;
-                        } else if ($xnum2 <= $xpersiandatetime['datetime3'] && $xnum2 > $xpersiandatetime['datetime4']) {
-                            $xfiltered2[] = $xnum;
-                        } else {
-                            $xfiltered3 = implode(',', $xfiltered2) . ',';
-                            if ($xchatsstatus !== $xfiltered3) {
-                                $xupdate = $xconnection->prepare("UPDATE userstable SET chatsstatus=? WHERE username=?");
-                                $xupdate->execute([$xfiltered3, $_POST['xreceiverchat']]);
+                if (!empty($xselect1_r['chats'])) {
+
+                    $xtotal = 0;
+
+                    if (!empty($xselect1_r['chatsstatus']) && strpos($xselect1_r['chatsstatus'], $xpersiandatetime['datetime3']) !== false) {
+
+                        $xfiltered = [];
+                        $xfiltered2 = [];
+                        $xfiltered3 = '';
+                        $xarray = explode(',', substr($xselect1_r['chatsstatus'], 0, -1));
+
+                        $xupdate2 = $xconnection->prepare("UPDATE userstable SET chatsstatus=? WHERE username=?");
+
+                        foreach ($xarray as $xnum) {
+                            $xnum2 = explode('>', $xnum)[1];
+                            if ($xnum2 >= $xpersiandatetime['datetime2']) {
+                                $xfiltered2[] = $xnum;
+                            } else if ($xnum2 < $xpersiandatetime['datetime2'] && $xnum2 > $xpersiandatetime['datetime3']) {
+                                $xfiltered2[] = $xnum;
+                                $xfiltered[] = $xnum;
+                            } else if ($xnum2 <= $xpersiandatetime['datetime3'] && $xnum2 > $xpersiandatetime['datetime4']) {
+                                $xfiltered2[] = $xnum;
+                            } else {
+                                $xfiltered3 = implode(',', $xfiltered2) . ',';
+                                if ($xselect1_r['chatsstatus'] !== $xfiltered3) {
+                                    $xupdate2->execute([$xfiltered3, $_POST['xreceiverchat']]);
+                                }
+                                break;
                             }
-                            break;
                         }
+
+                        $xfiltered = array_flip($xfiltered);
+                        $xtotal = count($xfiltered);
                     }
-                    $xfiltered = array_flip($xfiltered);
-                    $xtotal = count($xfiltered);
+
+                    echo json_encode(array("xchats" => $xselect1_r['chats'], "xtotal" => $xtotal));
                 }
-                $xresponse = array("xchats" => $xchats, "xtotal" => $xtotal);
-                echo json_encode($xresponse);
+            } catch (Throwable $e) {
+                echo json_encode(array("xchats" => "Unfortunately, there is a problem !", "xtotal" => 0));
+            } finally {
+                $xconnection = null;
             }
         }
     }
