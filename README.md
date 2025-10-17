@@ -1,3 +1,3 @@
-# counting-online-users  
-This project is developed in PHP language.  
+# counting online users  
+This project was developed using PHP  
 @masoudiofficial
