@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 27, 2025 at 08:29 AM
+-- Generation Time: Oct 17, 2025 at 11:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `chat`
+-- Database: `status`
 --
 
 -- --------------------------------------------------------
@@ -28,17 +28,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `userstable` (
-  `username` varchar(32) NOT NULL,
+  `username` char(32) NOT NULL,
   `chats` mediumtext NOT NULL,
   `chatsstatus` mediumtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `userstable`
+-- Indexes for dumped tables
 --
 
-INSERT INTO `userstable` (`username`, `chats`, `chatsstatus`) VALUES
-('masoudi', '', '');
+--
+-- Indexes for table `userstable`
+--
+ALTER TABLE `userstable`
+  ADD UNIQUE KEY `username` (`username`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
